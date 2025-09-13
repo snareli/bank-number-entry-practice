@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>银行数字录入练习</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .timer {
+            font-size: 24px;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .next-number-section {
+            flex: 1;
+            text-align: center;
+        }
+
+        .next-label {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .next-number {
+            font-size: 24px;
+            color: #495057;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .current-number-section {
+            flex: 1.5;
+            text-align: center;
+        }
+
+        .current-label {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .current-number {
+            font-size: 48px;
+            color: #2c3e50;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 4px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .input-section {
+            text-align: center;
+        }
+
+        .input-field {
+            font-size: 32px;
+            padding: 15px 20px;
+            border: 3px solid #3498db;
+            border-radius: 10px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            width: 300px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .input-field.error {
+            border-color: #e74c3c;
+            background-color: #ffe6e6;
+        }
+
+        .input-field.correct {
+            border-color: #27ae60;
+            background-color: #e8f5e8;
+        }
+
+        .start-button {
+            font-size: 20px;
+            padding: 15px 40px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .start-button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .results {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .results h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            font-size: 16px;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .pause-btn {
+            background: #f39c12;
+            color: white;
+        }
+
+        .pause-btn:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .pause-btn.paused {
+            background: #3498db;
+        }
+
+        .stop-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .stop-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        #startArea {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        kbd {
+            background-color: #f8f9fa;
+            border: 1px solid #d1d5db;
+            border-radius: 3px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            color: #333;
+            display: inline-block;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1;
+            padding: 3px 6px;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 600px) {
+            .main-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .current-number {
+                font-size: 36px;
+            }
+            
+            .input-field {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">银行数字录入练习</h1>
+            <div class="timer" id="timer">5:00</div>
+            <div class="progress" id="progress">准备开始</div>
+        </div>
+
+        <div id="gameArea" class="hidden">
+            <div class="main-content">
+                <div class="next-number-section">
+                    <div class="next-label">下一个数字</div>
+                    <div class="next-number" id="nextNumber">-</div>
+                </div>
+                <div class="current-number-section">
+                    <div class="current-label">当前录入数字</div>
+                    <div class="current-number" id="currentNumber">-</div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <input type="text" class="input-field" id="inputField" placeholder="输入数字" maxlength="10" inputmode="numeric" pattern="[0-9]*">
+            </div>
+            
+            <div class="control-buttons">
+                <button class="control-btn pause-btn" id="pauseBtn" onclick="pauseGame()">暂停</button>
+                <button class="control-btn stop-btn" id="stopBtn" onclick="stopGame()">停止</button>
+            </div>
+        </div>
+
+        <div id="startArea">
+            <button class="start-button" onclick="startGame()">开始练习</button>
+            <div style="margin-top: 15px; font-size: 14px; color: #666;">
+                快捷键：按 <kbd>F5</kbd> 开始/暂停
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h2>练习完成！</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="correctCount">0</div>
+                    <div class="stat-label">正确数量</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracy">0%</div>
+                    <div class="stat-label">准确率</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="speed">0</div>
+                    <div class="stat-label">每分钟录入数</div>
+                </div>
+            </div>
+            <button class="start-button" onclick="resetGame()">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        let numbers = [];
+        let currentIndex = 0;
+        let startTime;
+        let timerInterval;
+        let correctAnswers = 0;
+        let totalAnswers = 0;
+        let timeLeft = 300; // 5分钟 = 300秒
+
+        // 生成随机数字
+        function generateRandomNumber() {
+            const length = Math.floor(Math.random() * 5) + 6; // 6-10位
+            let number = '';
+            for (let i = 0; i < length; i++) {
+                number += Math.floor(Math.random() * 10);
+            }
+            return number;
+        }
+
+        // 初始化数字列表
+        function initializeNumbers() {
+            numbers = [];
+            for (let i = 0; i < 100; i++) {
+                numbers.push(generateRandomNumber());
+            }
+        }
+
+        let isPaused = false;
+        
+        // 键盘快捷键监听
+        document.addEventListener('keydown', function(e) {
+            // F5键作为开始/暂停快捷键
+            if (e.key === 'F5') {
+                e.preventDefault(); // 阻止默认的F5刷新页面行为
+                
+                if (document.getElementById('startArea').classList.contains('hidden') && 
+                    document.getElementById('gameArea').classList.contains('hidden') === false) {
+                    // 游戏进行中，触发暂停/继续
+                    pauseGame();
+                } else if (document.getElementById('startArea').classList.contains('hidden') === false) {
+                    // 在游戏开始前，F5可以开始游戏
+                    startGame();
+                }
+            }
+        });
+
+        // 开始游戏
+        function startGame() {
+            initializeNumbers();
+            currentIndex = 0;
+            correctAnswers = 0;
+            totalAnswers = 0;
+            timeLeft = 300;
+            isPaused = false;
+            
+            document.getElementById('startArea').classList.add('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            document.getElementById('results').style.display = 'none';
+            
+            // 重置控制按钮状态
+            document.getElementById('inputField').disabled = false;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('pauseBtn').textContent = '暂停';
+            document.getElementById('pauseBtn').classList.remove('paused');
+            
+            updateDisplay();
+            startTimer();
+            
+            // 聚焦输入框
+            setTimeout(() => {
+                document.getElementById('inputField').focus();
+            }, 100);
+        }
+
+        // 暂停/继续游戏
+        function pauseGame() {
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (!isPaused) {
+                // 暂停游戏
+                clearInterval(timerInterval);
+                document.getElementById('inputField').disabled = true;
+                pauseBtn.textContent = '继续';
+                pauseBtn.classList.add('paused');
+                isPaused = true;
+            } else {
+                // 继续游戏
+                startTimer();
+                document.getElementById('inputField').disabled = false;
+                pauseBtn.textContent = '暂停';
+                pauseBtn.classList.remove('paused');
+                isPaused = false;
+                document.getElementById('inputField').focus();
+            }
+        }
+
+        // 停止游戏
+        function stopGame() {
+            clearInterval(timerInterval);
+            
+            // 禁用输入和控制按钮
+            document.getElementById('inputField').disabled = true;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = true;
+            
+            // 显示确认对话框
+            if (confirm('确定要停止练习吗？\n\n当前进度：' + (currentIndex + 1) + '/' + numbers.length)) {
+                endGame();
+            } else {
+                // 如果取消停止，重新启用控制
+                document.getElementById('inputField').disabled = false;
+                document.getElementById('pauseBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = false;
+                
+                // 如果之前不是暂停状态，重启计时器
+                if (!isPaused) {
+                    startTimer();
+                }
+            }
+        }
+
+        // 结束游戏
+        function endGame() {
+            clearInterval(timerInterval);
+            
+            // 禁用输入和控制按钮
+            document.getElementById('inputField').disabled = true;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = true;
+            
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('results').style.display = 'block';
+            
+            const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+            const elapsedTime = 300 - timeLeft;
+            const speed = elapsedTime > 0 ? Math.round((totalAnswers / elapsedTime) * 60) : 0;
+            
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('speed').textContent = speed;
+        }
+
+        // 重置游戏
+        function resetGame() {
+            document.getElementById('startArea').classList.remove('hidden');
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('timer').textContent = '5:00';
+            document.getElementById('progress').textContent = '准备开始';
+            
+            // 重置输入和控制按钮
+            document.getElementById('inputField').value = '';
+            document.getElementById('inputField').className = 'input-field';
+            document.getElementById('inputField').disabled = false;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('pauseBtn').textContent = '暂停';
+            document.getElementById('pauseBtn').classList.remove('paused');
+            
+            // 重置暂停状态
+            isPaused = false;
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            if (currentIndex < numbers.length) {
+                document.getElementById('currentNumber').textContent = numbers[currentIndex];
+                document.getElementById('nextNumber').textContent = currentIndex + 1 < numbers.length ? numbers[currentIndex + 1] : '完成';
+                
+                // 计算实时准确率
+                const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+                document.getElementById('progress').textContent = `进度: ${currentIndex + 1}/${numbers.length} | 准确率: ${accuracy}%`;
+            }
+        }
+
+        // 开始计时器
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('timer').textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // 处理输入
+        document.getElementById('inputField').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const input = this.value.trim();
+                const currentNumber = numbers[currentIndex];
+                
+                if (input === currentNumber) {
+                    correctAnswers++;
+                    this.className = 'input-field correct';
+                } else {
+                    this.className = 'input-field error';
+                }
+                
+                totalAnswers++;
+                currentIndex++;
+                
+                // 重置输入框
+                this.value = '';
+                this.className = 'input-field';
+                
+                if (currentIndex >= numbers.length) {
+                    endGame();
+                } else {
+                    updateDisplay();
+                }
+            }
+        });
+
+        // 只允许输入数字
+        document.getElementById('inputField').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('inputField').focus();
+        });
+    </script>
+</body>
+</html>
